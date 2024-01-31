@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  n5.microservices.user.api:
+    image: ${DOCKER_REGISTRY-}n5microservicesuserapi
+    build:
+      context: .
+      dockerfile: N5.Microservices.User.API/Dockerfile
+    networks:
+      - app-tier
+
+  kafka:
+    image: 'bitnami/kafka:latest'
+    volumes:
+    - /path/to/kafka-persistence:/bitnami/kafka
+    networks:
+      - app-tier
