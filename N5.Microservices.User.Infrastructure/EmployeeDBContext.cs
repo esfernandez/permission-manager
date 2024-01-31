@@ -7,11 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace N5.Microservices.User.Infrastructure;
-public partial class EmployeeDBContext : DbContext
+public class EmployeeDBContext : DbContext
 {
     public virtual DbSet<Employee> Employees { get; set; }
+    public virtual DbSet<Permission> Permissions { get; set; }
+    public virtual DbSet<PermissionType> PermissionTypes { get; set; }
 
-    public EmployeeDBContext(): base()
-    {
-    }
+    public EmployeeDBContext(DbContextOptions<EmployeeDBContext> options) : base(options) { }
 }

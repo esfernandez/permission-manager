@@ -13,4 +13,6 @@ public class Employee : Entity<Guid>
     /// </summary>
     public string IdentifierCode { get; set; }
     public string Email { get; set; }
+
+    public IEnumerable<Permission> Permissions { get; set; }
 }

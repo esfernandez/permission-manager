@@ -1,4 +1,5 @@
-using N5.Microservices.User.Infrastructure;
+using N5.Microservices.User.API;
+using N5.Microservices.User.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.DefineApplication();
+
+builder.Services.InjectDependencies();
 
 var app = builder.Build();
 

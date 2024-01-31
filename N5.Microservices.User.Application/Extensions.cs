@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace N5.Microservices.User.Infrastructure;
+namespace N5.Microservices.User.Application;
 public static class Extensions
 {
     public static void DefineApplication(this IServiceCollection serviceCollection)

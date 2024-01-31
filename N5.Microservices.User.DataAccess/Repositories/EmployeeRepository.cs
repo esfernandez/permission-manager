@@ -1,36 +1,32 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using N5.Microservices.User.DataAccess.Repositories.Interfaces;
 using N5.Microservices.User.Domain;
-
+using N5.Microservices.User.Infrastructure;
 namespace N5.Microservices.User.DataAccess.Repositories;
 
 public class EmployeeRepository : IEmployeeRepository
 {
     private bool disposed = false;
     private readonly EmployeeDBContext _context;
-    public EmployeeRepository()
-    {
-        _context = new EmployeeDBContext();
-    }
-    
     public EmployeeRepository(EmployeeDBContext context)
     {
         _context = context;
     }
     
-    public IEnumerable<Employee> GetAll()
+    public async Task<IEnumerable<Employee>> GetAll()
     {
-        return _context.Employees.ToList();
+        return await _context.Employees.ToListAsync();
     }
     
-    public Employee GetById(int EmployeeID)
+    public async Task<Employee?> GetById(Guid EmployeeID)
     {
-        return _context.Employees.Find(EmployeeID);
+        return await _context.Employees.FindAsync(EmployeeID);
     }
     
-    public void Insert(Employee employee)
+    public async Task<Employee> Insert(Employee employee)
     {
-        _context.Employees.Add(employee);
+        await _context.Employees.AddAsync(employee);
+        return employee;
     }
     
     public void Update(Employee employee)
@@ -38,18 +34,18 @@ public class EmployeeRepository : IEmployeeRepository
         _context.Entry(employee).State = EntityState.Modified;
     }
     
-    public void Delete(int EmployeeID)
+    public async Task Delete(Guid id)
     {
-        Employee employee = _context.Employees.Find(EmployeeID);
+        Employee? employee = await _context.Employees.FindAsync(id);
         if (employee != null)
         {
             _context.Employees.Remove(employee);
         }
     }
     
-    public void Save()
+    public async Task Save()
     {
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 
     protected virtual void Dispose(bool disposing)
