@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace N5.Microservices.User.Application.DTOs;
-internal class EmployeeDto
+public class EmployeeDto
 {
     public string Name { get; set; }
     public string LastName { get; set; }

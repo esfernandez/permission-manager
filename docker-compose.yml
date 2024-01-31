@@ -15,3 +15,22 @@ services:
     - /path/to/kafka-persistence:/bitnami/kafka
     networks:
       - app-tier
+
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+    - 1436:1436
+    environment:
+      - MSSQL_SA_PASSWORD=yourStrong(!)Password
+      - ACCEPT_EULA=Y
+    networks:
+      - app-tier
+  
+  elastic:
+    image: elasticsearch:tag
+    ports:
+    - 9300:9300
+    environment:
+      - discovery.type=single-node
+    networks:
+      - app-tier
