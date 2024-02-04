@@ -27,7 +27,7 @@ services:
       - app-tier
   
   elastic:
-    image: elasticsearch:tag
+    image: elasticsearch:latest
     ports:
     - 9300:9300
     environment:

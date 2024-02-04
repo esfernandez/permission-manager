@@ -7,8 +7,8 @@ namespace N5.Microservices.User.DataAccess.Repositories;
 public class EmployeeRepository : IEmployeeRepository
 {
     private bool disposed = false;
-    private readonly EmployeeDBContext _context;
-    public EmployeeRepository(EmployeeDBContext context)
+    private readonly EmployeeDbContext _context;
+    public EmployeeRepository(EmployeeDbContext context)
     {
         _context = context;
     }
@@ -20,7 +20,7 @@ public class EmployeeRepository : IEmployeeRepository
     
     public async Task<Employee?> GetById(Guid EmployeeID)
     {
-        return await _context.Employees.FindAsync(EmployeeID);
+        return await _context.Employees.Include(x => x.Permissions).FirstOrDefaultAsync(x => x.Id == EmployeeID);
     }
     
     public async Task<Employee> Insert(Employee employee)

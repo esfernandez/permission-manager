@@ -10,4 +10,6 @@ public interface IPermissionRepository
 {
     Task<Permission> RequestPermission(Permission permission);
     Task UpdatePermission(Permission permission);
+    Task<IEnumerable<Permission>> GetPermissions(Employee employee);
+    Task SyncPermissions(Employee employee);
 }

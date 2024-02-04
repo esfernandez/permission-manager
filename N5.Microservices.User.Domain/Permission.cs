@@ -10,4 +10,6 @@ public class Permission : Entity<Guid>
 {
     public bool Granted { get; set; }
     public PermissionType Type { get; set; }
+
+    public Employee Employee { get; set; }
 }

@@ -1,5 +1,6 @@
 using N5.Microservices.User.API;
 using N5.Microservices.User.Application;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.DefineApplication();
 
 builder.Services.InjectDependencies();
+
+builder.Host.UseSerilog((ctx, lc) => lc
+    .WriteTo.Console()
+    .ReadFrom.Configuration(ctx.Configuration));
 
 var app = builder.Build();
 

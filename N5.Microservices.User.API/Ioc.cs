@@ -10,6 +10,6 @@ public static class Ioc
     {
         services.AddSingleton<IEventProducer, KafkaProducer>();
 
-        services.AddDbContextFactory<EmployeeDBContext>(options => options.UseSqlServer("name=ConnectionStrings:Database"));
+        services.AddDbContextFactory<EmployeeDbContext>(options => options.UseSqlServer("name=ConnectionStrings:Database"));
     }
 }

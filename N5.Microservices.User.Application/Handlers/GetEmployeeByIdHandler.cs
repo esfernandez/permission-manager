@@ -11,6 +11,7 @@ public class GetEmployeeByIdHandler(IEmployeeRepository repo) : IRequestHandler<
 
     public async Task<EmployeeDto> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
     {
-        return (await _repo.GetById(request.id)).Adapt<EmployeeDto>();
+        return (await _repo.GetById(request.id) ?? throw new InvalidOperationException($"Employee {request.id} not exist."))
+            .Adapt<EmployeeDto>();
     }
 }

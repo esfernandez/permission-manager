@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using N5.Microservices.User.Application.Commands;
 using N5.Microservices.User.Application.DTOs;
+using N5.Microservices.User.Application.Queries;
 using N5.Microservices.User.Domain;
 using N5.Microservices.User.Infrastructure.Queries;
 using System.Security;
@@ -50,8 +51,9 @@ public class PermissionsController : ControllerBase
         {
             return NotFound("Employee not exist");
         }
+        await _mediator.Send(permission);
 
-        return Ok(await _mediator.Send(permission));
+        return Ok();
     }
 
     /// <summary>
