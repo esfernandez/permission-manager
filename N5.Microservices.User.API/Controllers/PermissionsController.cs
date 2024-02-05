@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using N5.Microservices.User.Application.Commands;
+using N5.Microservices.User.Application.DTOs;
 using N5.Microservices.User.Application.Exceptions;
 using N5.Microservices.User.Application.Queries;
 using N5.Microservices.User.Infrastructure.Queries;
@@ -27,14 +28,14 @@ public class PermissionsController : ControllerBase
     /// <param name="permission">Objeto de permiso</param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<IActionResult> RequestPermission([FromQuery] Guid employeeId, RequestPermissionCommand permission)
+    public async Task<IActionResult> RequestPermission([FromQuery] Guid employeeId, PermissionDto permission)
     {
-        if (await EmployeeExist(employeeId))
+        if (!await EmployeeExist(employeeId))
         {
             return NotFound("Employee not exist");
         }
 
-        return Ok(await _mediator.Send(permission));
+        return Ok(await _mediator.Send(new RequestPermissionCommand(permission, employeeId)));
     }
 
     /// <summary>
@@ -43,13 +44,14 @@ public class PermissionsController : ControllerBase
     /// <param name="employeeId">Id de empleado</param>
     /// <param name="permission">Objeto de permiso</param>
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdatePermission(Guid employeeId, UpdatePermissionCommand permission)
+    public async Task<IActionResult> UpdatePermission(Guid employeeId, PermissionDto permission)
     {
-        if (await EmployeeExist(employeeId))
+        if (!await EmployeeExist(employeeId))
         {
             return NotFound("Employee not exist");
         }
-        await _mediator.Send(permission);
+        
+        await _mediator.Send(new UpdatePermissionCommand(permission, employeeId));
 
         return Ok();
     }
@@ -62,7 +64,7 @@ public class PermissionsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetPermissions(Guid employeeId)
     {
-        if (await EmployeeExist(employeeId))
+        if (!await EmployeeExist(employeeId))
         {
             return NotFound("Employee not exist");
         }

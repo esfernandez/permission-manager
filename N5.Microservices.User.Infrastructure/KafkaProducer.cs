@@ -1,6 +1,7 @@
 ﻿using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using N5.Microservices.User.Infrastructure.Interfaces;
 using N5.Utils;
 using System;
@@ -15,11 +16,11 @@ public class KafkaProducer: IEventProducer
     private readonly IProducer<string, string> _producer;
     private readonly ILogger<KafkaProducer> _logger;
 
-    public KafkaProducer(IConfiguration configuration, ILogger<KafkaProducer> logger)
+    public KafkaProducer(IOptions<KafkaOptions> options, ILogger<KafkaProducer> logger)
     {
         var producerConfig = new ProducerConfig
         {
-            BootstrapServers = configuration["ConnectionStrings:Kafka"]
+            BootstrapServers = options.Value.Url,
         };
 
         _logger = logger;

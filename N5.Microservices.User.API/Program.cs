@@ -17,6 +17,10 @@ builder.Services.DefineApplication();
 
 builder.Services.InjectDependencies();
 
+builder.Services
+    .Configure<ElasticsearchOptions>(builder.Configuration.GetSection("ConnectionStrings:Elastic"))
+    .Configure<KafkaOptions>(builder.Configuration.GetSection("ConnectionStrings:Kafka"));
+
 builder.Host.UseSerilog((ctx, lc) => lc
     .WriteTo.Console()
     .ReadFrom.Configuration(ctx.Configuration));

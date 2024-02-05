@@ -7,4 +7,4 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace N5.Microservices.User.Application.Commands;
-public record UpdatePermissionCommand(PermissionDto permissionDto) : IRequest;
+public record UpdatePermissionCommand(PermissionDto permissionDto, Guid employeeId) : IRequest;

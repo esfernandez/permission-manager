@@ -1,18 +1,12 @@
-﻿using Azure;
-using Confluent.Kafka;
-using Elastic.Clients.Elasticsearch;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.IndexManagement;
 using Elastic.Transport;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using N5.Microservices.User.Infrastructure.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace N5.Microservices.User.Infrastructure;
-public class ElasticSearchClient: IElasticSearchClient
+public class ElasticSearchClient : IElasticSearchClient
 {
     private readonly ElasticsearchClient _client;
     private readonly ILogger<ElasticSearchClient> _logger;
@@ -26,10 +20,9 @@ public class ElasticSearchClient: IElasticSearchClient
         ArgumentException.ThrowIfNullOrEmpty(options.Value.User);
         ArgumentException.ThrowIfNullOrEmpty(options.Value.Password);
 
-        var values = options.Value;
-
         var settings = new ElasticsearchClientSettings(new Uri(options.Value.Url))
-            .Authentication(new BasicAuthentication(options.Value.User, options.Value.Password));   
+            .Authentication(new BasicAuthentication(options.Value.User, options.Value.Password))
+            .ServerCertificateValidationCallback((x, y, z, q) => true);
 
         _client = new ElasticsearchClient(settings);
 
@@ -42,7 +35,28 @@ public class ElasticSearchClient: IElasticSearchClient
     {
         var response = await _client.Indices.CreateAsync(index);
 
+        if (!response.IsValidResponse)
+        {
+            response.TryGetOriginalException(out var ex);
+            throw new Exception("No se pudo crear el índice en el servicio de ElasticSearch", ex);
+        }
+
         return response.IsSuccess();
+    }
+
+    public async Task<IEnumerable<string>> GetIndexes()
+    {
+        var response = await _client.Indices.GetAsync(new GetIndexRequest(Indices.All));
+
+        if (!response.IsValidResponse)
+        {
+            response.TryGetOriginalException(out var ex);
+            throw new Exception("No se pudo leer los índices del servicio de ElasticSearch",ex);
+        }
+
+        var indices = response.Indices.ToList();
+
+        return indices.Select(x => x.Key.ToString());
     }
 
     public async Task<bool> Index(string index, object obj)
@@ -52,7 +66,7 @@ public class ElasticSearchClient: IElasticSearchClient
         return response.IsSuccess();
     }
 
-    public async Task<T?> Get<T>(string index, int id) where T: class
+    public async Task<T?> Get<T>(string index, int id) where T : class
     {
         var response = await _client.GetAsync<T>(id, idx => idx.Index(index));
 

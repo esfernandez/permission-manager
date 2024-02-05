@@ -57,13 +57,14 @@ services:
     - 9300:9300
     environment:
       - discovery.type=single-node
+      #- ELASTIC_PASSWORD="your_password"
 
-  # kibana:
-  #   image: docker.elastic.co/kibana/kibana:8.11.1
-  #   ports:
-  #     - 5601:5601
-  #   depends_on:
-  #     - elastic
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.1
+    ports:
+      - 5601:5601
+    depends_on:
+      - elastic
 
   kafka-ui:
     container_name: kafka-ui

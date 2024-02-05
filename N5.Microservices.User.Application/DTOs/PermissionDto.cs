@@ -10,5 +10,5 @@ public class PermissionDto
     public Guid Id { get; set; }
     public bool Granted { get; set; }
 
-    public PermissionTypeDto PermissionType { get; set; }
+    public PermissionTypeDto Type { get; set; }
 }

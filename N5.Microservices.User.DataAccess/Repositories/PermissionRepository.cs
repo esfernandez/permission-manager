@@ -24,11 +24,14 @@ public class PermissionRepository : IPermissionRepository
 
     public async Task<IEnumerable<Permission>> GetPermissions(Employee employee)
     {
+        CheckIndex();
+
         var searchResponse = await _elasticSearchClient.Client.SearchAsync<Permission>(s => s
+        .Index(INDEX_ELASTIC)
         .Query(q => q
             .Match(m => m
                 .Field(f => f.Employee.Id)
-                .Query(employee.Id.ToString())  // Reemplaza "1" con el ID del Employee específico
+                .Query(employee.Id.ToString())
             )
         ));
 
@@ -57,6 +60,7 @@ public class PermissionRepository : IPermissionRepository
 
     public async Task SyncPermissions(Employee employee)
     {
+        CheckIndex();
         var response = await _elasticSearchClient.Client.SearchAsync<Permission>();
 
         var queryContainer = new TermQuery(new Field("employee.id"))
@@ -77,5 +81,15 @@ public class PermissionRepository : IPermissionRepository
     public async Task Save()
     {
         await _dbContext.SaveChangesAsync();
+    }
+
+    private void CheckIndex()
+    {
+        var indices = Task.Run(() => _elasticSearchClient.GetIndexes()).GetAwaiter().GetResult();
+
+        if (!indices.Any(x => x == INDEX_ELASTIC))
+        {
+            Task.Run(() => _elasticSearchClient.CreateIndex(INDEX_ELASTIC)).GetAwaiter().GetResult();
+        }
     }
 }

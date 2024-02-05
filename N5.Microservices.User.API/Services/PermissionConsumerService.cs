@@ -7,11 +7,11 @@ using N5.Utils;
 namespace N5.Microservices.User.API.Services;
 public class PermissionConsumerService : BackgroundService
 {
-    private readonly IEventConsumer<PermissionDto> _consumer;
+    private readonly IEventConsumer<PermissionEventDto> _consumer;
     private readonly IMediator _mediator;
     private readonly ILogger<PermissionConsumerService> _logger;
 
-    public PermissionConsumerService(ILogger<PermissionConsumerService> logger, IEventConsumer<PermissionDto> consumer, IMediator mediator)
+    public PermissionConsumerService(ILogger<PermissionConsumerService> logger, IEventConsumer<PermissionEventDto> consumer, IMediator mediator)
     {
         _logger = logger;
         _consumer = consumer;
@@ -20,7 +20,7 @@ public class PermissionConsumerService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _consumer.Subscribe("Permissions.Updates");
+        _consumer.Subscribe("Permissions");
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -43,8 +43,8 @@ public class PermissionConsumerService : BackgroundService
         _consumer.StopConsume();
     }
 
-    public async Task ProcessMessage(PermissionDto permission, CancellationToken stoppingToken)
+    public async Task ProcessMessage(PermissionEventDto permission, CancellationToken stoppingToken)
     {
-        await _mediator.Send(new SyncPermissionCommand(permission.Id), stoppingToken);
+        await _mediator.Send(new SyncPermissionCommand(permission.EmployeeId), stoppingToken);
     }
 }
