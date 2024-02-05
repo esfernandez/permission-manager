@@ -8,5 +8,8 @@ public class EmployeeDbContext : DbContext
     public virtual DbSet<Permission> Permissions { get; set; }
     public virtual DbSet<PermissionType> PermissionTypes { get; set; }
 
-    public EmployeeDbContext(DbContextOptions<EmployeeDbContext> options) : base(options) { }
+    public EmployeeDbContext(DbContextOptions<EmployeeDbContext> options) : base(options) 
+    {
+        
+    }
 }

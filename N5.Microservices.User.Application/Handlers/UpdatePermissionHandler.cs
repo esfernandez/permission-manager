@@ -11,5 +11,6 @@ public class UpdatePermissionHandler(IPermissionRepository permissionRepository)
     public async Task Handle(UpdatePermissionCommand request, CancellationToken cancellationToken)
     {
         await permissionRepository.UpdatePermission(request.permissionDto.Adapt<Permission>());
+        await permissionRepository.Save();
     }
 }

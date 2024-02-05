@@ -13,7 +13,7 @@ public class RequestPermissionHandler(IPermissionRepository permissionRepository
     public async Task<PermissionDto> Handle(RequestPermissionCommand request, CancellationToken cancellationToken)
     {
         var permission = (await permissionRepository.RequestPermission(request.permissionDto.Adapt<Permission>())).Adapt<PermissionDto>();
-
+        await permissionRepository.Save();
         await eventProducer.SendEvent("permission.request", permission);
 
         return permission;

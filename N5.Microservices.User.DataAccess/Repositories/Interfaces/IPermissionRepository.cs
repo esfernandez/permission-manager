@@ -12,4 +12,5 @@ public interface IPermissionRepository
     Task UpdatePermission(Permission permission);
     Task<IEnumerable<Permission>> GetPermissions(Employee employee);
     Task SyncPermissions(Employee employee);
+    Task Save();
 }

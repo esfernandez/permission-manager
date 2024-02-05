@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using N5.Microservices.User.Application.DTOs;
+using N5.Microservices.User.Application.Exceptions;
 using N5.Microservices.User.Domain;
 using N5.Microservices.User.Infrastructure.Commands;
 using N5.Microservices.User.Infrastructure.Queries;
@@ -29,18 +30,19 @@ public class EmployeesController : ControllerBase
     [Route("{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var employee = await _mediator.Send(new GetEmployeeByIdQuery(id));
-
-        if (employee == null)
+        try
+        {
+            var employee = await _mediator.Send(new GetEmployeeByIdQuery(id));
+            return Ok(employee);
+        }
+        catch (NotFoundException)
         {
             return NotFound();
         }
-
-        return Ok(employee);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateEmployeeCommand employee)
+    public async Task<IActionResult> Create([FromBody]CreateEmployeeCommand employee)
     {
         var employeeCreated = await _mediator.Send(employee);
 

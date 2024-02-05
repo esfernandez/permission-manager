@@ -6,31 +6,75 @@ services:
     build:
       context: .
       dockerfile: N5.Microservices.User.API/Dockerfile
-    networks:
-      - app-tier
 
   kafka:
-    image: 'bitnami/kafka:latest'
+    image: bitnami/kafka:3.6
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - 9092:9092
+      - 9093:9093 
+    environment:
+      # - KAFKA_CFG_BROKER_ID=1
+      # - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      # - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      # - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
     volumes:
-    - /path/to/kafka-persistence:/bitnami/kafka
-    networks:
-      - app-tier
+    - employeekafka3:/bitnami/kafka
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+     image: bitnami/zookeeper:3.7.1
+     hostname: zookeeper
+     container_name: zookeeper
+     ports:
+       - 2181:2181
+     environment:
+       - ALLOW_ANONYMOUS_LOGIN=yes
 
   sql:
     image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
-    - 1436:1436
+    - 1436:1433
     environment:
       - MSSQL_SA_PASSWORD=yourStrong(!)Password
       - ACCEPT_EULA=Y
-    networks:
-      - app-tier
+    volumes:
+      - employeesqldb:/var/opt/mssql 
   
   elastic:
-    image: elasticsearch:latest
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    mem_limit: 1G
     ports:
+    - 9200:9200
     - 9300:9300
     environment:
       - discovery.type=single-node
-    networks:
-      - app-tier
+
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:8.11.1
+  #   ports:
+  #     - 5601:5601
+  #   depends_on:
+  #     - elastic
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - kafka
+    environment:
+      - DYNAMIC_CONFIG_ENABLED=true
+
+volumes:
+  employeesqldb:
+  employeekafka3:

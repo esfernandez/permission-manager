@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace N5.Microservices.User.Application.DTOs;
 public class EmployeeDto
 {
+    public Guid Id { get; set; }
     public string Name { get; set; }
     public string LastName { get; set; }
     public string IdentifierCode { get; set; }

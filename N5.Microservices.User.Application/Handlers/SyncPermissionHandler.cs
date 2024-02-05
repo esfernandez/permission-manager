@@ -17,7 +17,7 @@ public class SyncPermissionHandler(IPermissionRepository permissionRepository, I
     public async Task Handle(SyncPermissionCommand request, CancellationToken cancellationToken)
     {
         var employee = mediator.Send(new GetEmployeeByIdQuery(request.employeeId), cancellationToken);
-
         await permissionRepository.SyncPermissions(employee.Adapt<Employee>());
+        await permissionRepository.Save();
     }
 }

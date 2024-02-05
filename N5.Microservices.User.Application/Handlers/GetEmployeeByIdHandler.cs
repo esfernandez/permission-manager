@@ -1,6 +1,7 @@
 ﻿using Mapster;
 using MediatR;
 using N5.Microservices.User.Application.DTOs;
+using N5.Microservices.User.Application.Exceptions;
 using N5.Microservices.User.DataAccess.Repositories.Interfaces;
 using N5.Microservices.User.Infrastructure.Queries;
 
@@ -11,7 +12,7 @@ public class GetEmployeeByIdHandler(IEmployeeRepository repo) : IRequestHandler<
 
     public async Task<EmployeeDto> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
     {
-        return (await _repo.GetById(request.id) ?? throw new InvalidOperationException($"Employee {request.id} not exist."))
+        return (await _repo.GetById(request.id) ?? throw new NotFoundException($"Employee {request.id} not exist."))
             .Adapt<EmployeeDto>();
     }
 }

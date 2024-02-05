@@ -1,5 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using N5.Microservices.User.API;
 using N5.Microservices.User.Application;
+using N5.Microservices.User.Infrastructure;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +22,8 @@ builder.Host.UseSerilog((ctx, lc) => lc
     .ReadFrom.Configuration(ctx.Configuration));
 
 var app = builder.Build();
+
+app.Services.UseInfrastructure();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -73,4 +73,9 @@ public class PermissionRepository : IPermissionRepository
             await _elasticSearchClient.Client.BulkAsync(b => b.Index(INDEX_ELASTIC).IndexMany(employee.Permissions));
         }
     }
+
+    public async Task Save()
+    {
+        await _dbContext.SaveChangesAsync();
+    }
 }

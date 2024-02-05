@@ -1,11 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using N5.Microservices.User.Application.Commands;
-using N5.Microservices.User.Application.DTOs;
+using N5.Microservices.User.Application.Exceptions;
 using N5.Microservices.User.Application.Queries;
-using N5.Microservices.User.Domain;
 using N5.Microservices.User.Infrastructure.Queries;
-using System.Security;
 
 namespace N5.Microservices.User.API.Controllers;
 
@@ -31,7 +29,7 @@ public class PermissionsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> RequestPermission([FromQuery] Guid employeeId, RequestPermissionCommand permission)
     {
-        if (await EmployeeExits(employeeId))
+        if (await EmployeeExist(employeeId))
         {
             return NotFound("Employee not exist");
         }
@@ -47,7 +45,7 @@ public class PermissionsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdatePermission(Guid employeeId, UpdatePermissionCommand permission)
     {
-        if (await EmployeeExits(employeeId))
+        if (await EmployeeExist(employeeId))
         {
             return NotFound("Employee not exist");
         }
@@ -64,7 +62,7 @@ public class PermissionsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetPermissions(Guid employeeId)
     {
-        if (await EmployeeExits(employeeId))
+        if (await EmployeeExist(employeeId))
         {
             return NotFound("Employee not exist");
         }
@@ -73,9 +71,12 @@ public class PermissionsController : ControllerBase
     }
 
 
-    private async Task<bool> EmployeeExits(Guid employeeId)
+    private async Task<bool> EmployeeExist(Guid employeeId)
     {
-        var employee = await _mediator.Send(new GetEmployeeByIdQuery(employeeId));
-        return employee != null;
+        try
+        {
+            return await _mediator.Send(new GetEmployeeByIdQuery(employeeId)) != null;
+        }
+        catch (NotFoundException) { return false; }
     }
 }

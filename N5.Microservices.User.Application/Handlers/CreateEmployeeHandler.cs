@@ -13,7 +13,7 @@ public class CreateEmployeeHandler(IEmployeeRepository repo) : IRequestHandler<C
     async Task<EmployeeDto> IRequestHandler<CreateEmployeeCommand, EmployeeDto>.Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
     {
         var entity = await _repo.Insert(request.Adapt<Employee>());
-
+        await _repo.Save();
         return entity.Adapt<EmployeeDto>();
     }
 }
