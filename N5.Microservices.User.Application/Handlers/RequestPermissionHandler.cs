@@ -19,7 +19,8 @@ public class RequestPermissionHandler(
     {
         var permission = request.permissionDto.Adapt<Permission>();
 
-        permission.Employee = await employeeRepository.GetById(request.employeeId) ?? throw new NotFoundException("Employee not found");
+        permission.Employee = await employeeRepository.GetById(request.employeeId) 
+            ?? throw new NotFoundException("Employee not found");
 
         permission = (await permissionRepository.RequestPermission(permission));
         await permissionRepository.Save();
@@ -28,7 +29,6 @@ public class RequestPermissionHandler(
             Id = Guid.NewGuid(),
             EmployeeId = request.employeeId,
 
-            PermissionId = permission.Id,
             Action = "request"
         });
 

@@ -13,5 +13,4 @@ public class PermissionEventDto
 
     // Datos adicionales
     public Guid EmployeeId { get; internal set; }
-    public Guid PermissionId { get; internal set; }
 }
