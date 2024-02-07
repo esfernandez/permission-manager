@@ -1,6 +1,7 @@
 ﻿using Confluent.Kafka;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.QueryDsl;
+using Microsoft.EntityFrameworkCore;
 using N5.Microservices.User.DataAccess.Repositories.Interfaces;
 using N5.Microservices.User.Domain;
 using N5.Microservices.User.Domain.Abstractions;
@@ -24,24 +25,18 @@ public class PermissionRepository : IPermissionRepository
 
     public async Task<IEnumerable<Permission>> GetPermissions(Employee employee)
     {
-        CheckIndex();
-
-        var searchResponse = await _elasticSearchClient.Client.SearchAsync<Permission>(s => s
-        .Index(INDEX_ELASTIC)
-        .Query(q => q
-            .Match(m => m
-                .Field(f => f.Employee.Id)
-                .Query(employee.Id.ToString())
-            )
-        ));
-
-        if (searchResponse.IsValidResponse)
+        try
         {
-            return searchResponse.Documents.ToList();
+            CheckIndex();
+            return await _elasticSearchClient.SearchAsync<Permission, Guid>(
+                        f => f.Employee.Id,
+                        employee.Id.ToString(),
+                        INDEX_ELASTIC
+                    );
         }
-        else
+        catch(Exception ex)
         {
-            throw new ArgumentException($"Ocurrió un error al intentar obtener los permisos del empleado {employee.Id}");
+            throw new Exception($"Ocurrió un error al intentar obtener los permisos del empleado {employee.Id}", ex);
         }
     }
 
@@ -74,7 +69,12 @@ public class PermissionRepository : IPermissionRepository
 
         if (response.IsValidResponse)
         {
-            await _elasticSearchClient.Client.BulkAsync(b => b.Index(INDEX_ELASTIC).IndexMany(employee.Permissions));
+            var permissions = await _dbContext.Permissions
+                .Include(x => x.Employee)
+                .Where(x => x.Employee.Id == employee.Id)
+                .ToListAsync();
+
+            await _elasticSearchClient.Client.BulkAsync(b => b.Index(INDEX_ELASTIC).IndexMany(permissions));
         }
     }
 

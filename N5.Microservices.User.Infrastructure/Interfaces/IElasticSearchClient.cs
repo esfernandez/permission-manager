@@ -13,5 +13,7 @@ public interface IElasticSearchClient
     Task<bool> Index(string index, object obj);
     Task<T?> Get<T>(string index, int id) where T : class;
 
+    Task<List<T>> SearchAsync<T, S>(System.Linq.Expressions.Expression<Func<T, S>> exp, string query, string index);
+
     ElasticsearchClient Client { get; }
 }

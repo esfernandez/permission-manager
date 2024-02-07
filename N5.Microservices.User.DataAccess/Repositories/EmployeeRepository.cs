@@ -20,7 +20,8 @@ public class EmployeeRepository : IEmployeeRepository
     
     public async Task<Employee?> GetById(Guid EmployeeID)
     {
-        return await _context.Employees.Include(x => x.Permissions).FirstOrDefaultAsync(x => x.Id == EmployeeID);
+        return await _context.Employees
+            .FirstOrDefaultAsync(x => x.Id == EmployeeID);
     }
     
     public async Task<Employee> Insert(Employee employee)

@@ -3,7 +3,9 @@ using Elastic.Clients.Elasticsearch.IndexManagement;
 using Elastic.Transport;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using N5.Microservices.User.Domain;
 using N5.Microservices.User.Infrastructure.Interfaces;
+using System.Linq.Expressions;
 
 namespace N5.Microservices.User.Infrastructure;
 public class ElasticSearchClient : IElasticSearchClient
@@ -76,5 +78,26 @@ public class ElasticSearchClient : IElasticSearchClient
         }
 
         return null;
+    }
+
+    public async Task<List<T>> SearchAsync<T, S>(System.Linq.Expressions.Expression<Func<T, S>> exp, string query, string index)
+    {
+        var searchResponse = await Client.SearchAsync<T>(s => s
+            .Index(index)
+            .Query(q => q
+                .Match(m => m
+                    .Field(exp)
+                    .Query(query))
+                )
+            );
+
+        if (searchResponse.IsValidResponse)
+        {
+            return searchResponse.Documents.ToList();
+        }
+
+        searchResponse.TryGetOriginalException(out var ex);
+
+        throw new Exception("Error at search to ElasticSearch server.", ex);
     }
 }
