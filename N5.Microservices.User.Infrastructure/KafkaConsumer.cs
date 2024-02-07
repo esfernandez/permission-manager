@@ -68,7 +68,6 @@ public class KafkaConsumerService<TValue>: IEventConsumer<TValue> where TValue :
                 await action(consumeResult.Message.Value.FromJsonToObject<TValue>(), cancellationToken);
                 _logger.LogInformation($"Received {consumeResult.Message.Key}: {consumeResult.Message.Value}");
             }
-            _consumer.Commit(consumeResult);
         }
         catch(Exception ex)
         {
