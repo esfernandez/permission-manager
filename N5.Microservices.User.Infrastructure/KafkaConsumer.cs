@@ -6,28 +6,32 @@ using Confluent.Kafka;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using N5.Microservices.User.Domain;
+using N5.Microservices.User.Infrastructure;
 using N5.Microservices.User.Infrastructure.Interfaces;
+using N5.Utils;
 using static Confluent.Kafka.ConfigPropertyNames;
 
-public class KafkaConsumerService<TValue>: IEventConsumer<TValue>
+public class KafkaConsumerService<TValue>: IEventConsumer<TValue> where TValue : class
 {
-    private readonly IConsumer<string, TValue> _consumer;
+    private readonly IConsumer<string, string> _consumer;
     private readonly ILogger<KafkaConsumerService<TValue>> _logger;
     private readonly IEventProducer _producer;
 
-    public KafkaConsumerService(IConfiguration configuration, ILogger<KafkaConsumerService<TValue>> logger, IEventProducer producer)
+    public KafkaConsumerService(IOptions<KafkaOptions> options, ILogger<KafkaConsumerService<TValue>> logger, IEventProducer producer)
     {
         var consumerConfig = new ConsumerConfig
         {
-            BootstrapServers = configuration["Kafka:BootstrapServers"],
+            BootstrapServers = options.Value.Url,
             GroupId = "UserMicroserviceGroup",
             AutoOffsetReset = AutoOffsetReset.Earliest,
             EnableAutoCommit = false,
+            
         };
         _logger = logger;
         _producer = producer;
-        _consumer = new ConsumerBuilder<string, TValue>(consumerConfig).Build();
+        _consumer = new ConsumerBuilder<string, string>(consumerConfig).Build();
     }
 
     public void ProcessKafkaMessage(CancellationToken stoppingToken)
@@ -61,7 +65,7 @@ public class KafkaConsumerService<TValue>: IEventConsumer<TValue>
         {  
             if (consumeResult != null && !consumeResult.IsPartitionEOF)
             {
-                await action(consumeResult.Message.Value, cancellationToken);
+                await action(consumeResult.Message.Value.FromJsonToObject<TValue>(), cancellationToken);
                 _logger.LogInformation($"Received {consumeResult.Message.Key}: {consumeResult.Message.Value}");
             }
             _consumer.Commit(consumeResult);

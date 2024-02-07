@@ -43,7 +43,7 @@ public class PermissionsController : ControllerBase
     /// </summary>
     /// <param name="employeeId">Id de empleado</param>
     /// <param name="permission">Objeto de permiso</param>
-    [HttpPut("{id}")]
+    [HttpPut]
     public async Task<IActionResult> UpdatePermission(Guid employeeId, PermissionDto permission)
     {
         if (!await EmployeeExist(employeeId))

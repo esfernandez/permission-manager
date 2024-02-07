@@ -1,4 +1,6 @@
-﻿using N5.Microservices.User.Application;
+﻿using N5.Microservices.User.API.Services;
+using N5.Microservices.User.Application;
+using N5.Microservices.User.Application.DTOs;
 using N5.Microservices.User.DataAccess;
 using N5.Microservices.User.Infrastructure;
 
@@ -11,5 +13,9 @@ public static class Ioc
         services.DefineDataAccess();
         services.DefineInfrastructure();
         services.DefineApplication();
+
+        services.DefineEventConsumer<PermissionEventDto>();
+
+        services.AddHostedService<PermissionConsumerService>();
     }
 }

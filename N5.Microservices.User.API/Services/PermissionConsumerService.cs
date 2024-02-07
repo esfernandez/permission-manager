@@ -10,17 +10,23 @@ public class PermissionConsumerService : BackgroundService
     private readonly IEventConsumer<PermissionEventDto> _consumer;
     private readonly IMediator _mediator;
     private readonly ILogger<PermissionConsumerService> _logger;
+    private readonly IServiceProvider _serviceProvider;
 
-    public PermissionConsumerService(ILogger<PermissionConsumerService> logger, IEventConsumer<PermissionEventDto> consumer, IMediator mediator)
+    public PermissionConsumerService(
+        ILogger<PermissionConsumerService> logger, 
+        IEventConsumer<PermissionEventDto> consumer, 
+        IMediator mediator,
+        IServiceProvider serviceProvider)
     {
         _logger = logger;
         _consumer = consumer;
         _mediator = mediator;
+        _serviceProvider = serviceProvider;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _consumer.Subscribe("Permissions");
+        _consumer.Subscribe("permissions");
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -45,6 +51,7 @@ public class PermissionConsumerService : BackgroundService
 
     public async Task ProcessMessage(PermissionEventDto permission, CancellationToken stoppingToken)
     {
+        using var scope = _serviceProvider.CreateScope();
         await _mediator.Send(new SyncPermissionCommand(permission.EmployeeId), stoppingToken);
     }
 }
